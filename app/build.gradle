@@ -7,9 +7,10 @@ android {
     defaultConfig {
         applicationId "com.vishnu.notificationmanager"
         minSdkVersion 18
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+
     }
     buildTypes {
         release {
@@ -17,6 +18,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    productFlavors
+            {
+                playStoreFree
+                        {
+                           applicationId "com.vishnu.notificationmanager"
+                            manifestPlaceholders = [manifestApplicationId: "${applicationId}",
+                                                    onesignal_app_id: "81dcd2a0-52ca-42f8-9b9d-b41452aec219",
+                                                    onesignal_google_project_number: "927745685992"]
+                        }
+                amazonFree
+                        {
+                            applicationId "com.vishnu.notificationmanager"
+                            manifestPlaceholders = [manifestApplicationId: "${applicationId}",
+                                                    onesignal_app_id: "81dcd2a0-52ca-42f8-9b9d-b41452aec219",
+                                                    onesignal_google_project_number: "927745685992"]
+                        }
+
+            }
 }
 
 dependencies {
@@ -28,5 +48,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'com.facebook.stetho:stetho:1.3.1'
-    compile 'com.android.support:cardview-v7:21.0.+'
+    compile 'com.android.support:cardview-v7:23.1.1'
+    compile 'com.onesignal:OneSignal:2.+@aar'
+    compile 'com.google.android.gms:play-services-gcm:+'
 }

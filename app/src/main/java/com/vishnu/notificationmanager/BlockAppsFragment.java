@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,8 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.vishnu.notificationmanager.dummy.DummyContent;
 import com.vishnu.notificationmanager.dummy.DummyContent.DummyItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -22,31 +23,30 @@ import com.vishnu.notificationmanager.dummy.DummyContent.DummyItem;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ItemFragment extends Fragment  {
+public class BlockAppsFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String POSITION = "position";
-    ItemTouchHelper itemTouchHelper;
     // TODO: Customize parameters
-    private int mColumnCount = 4;
-    private SharedPreferences sharedPreferences;
+    private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
-    private MyItemRecyclerViewAdapter myItemRecyclerViewAdapter;
+    private ItemTouchHelper itemTouchHelper;
+    private BlockedAppsAdapter blockedAppsAdapter;
+   private SharedPreferences sharedPreferences;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ItemFragment() {
+    public BlockAppsFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ItemFragment newInstance(int columnCount,int position) {
-        ItemFragment fragment = new ItemFragment();
+    public static BlockAppsFragment newInstance(int columnCount) {
+        BlockAppsFragment fragment = new BlockAppsFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putInt(POSITION,position);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,8 +63,10 @@ public class ItemFragment extends Fragment  {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
-
+        View view = inflater.inflate(R.layout.blocked_apps_list, container, false);
+        final List<String> list = new ArrayList<>();
+        list.addAll(sharedPreferences.getAll().keySet());
+blockedAppsAdapter = new BlockedAppsAdapter(getActivity(),list, mListener);
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -74,33 +76,21 @@ public class ItemFragment extends Fragment  {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            myItemRecyclerViewAdapter = new MyItemRecyclerViewAdapter(getActivity(), DummyContent.ITEMS, mListener);
-            recyclerView.setAdapter(myItemRecyclerViewAdapter);
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(blockedAppsAdapter);
             ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
                 @Override
                 public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                   System.out.println(viewHolder.getAdapterPosition() +" "+ target.getAdapterPosition());
                     return false;
                 }
 
                 @Override
-                public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                    //Remove swiped item from list and notify the RecyclerView
-                    String position = String.valueOf((sharedPreferences.getAll().size() - 1) - viewHolder.getAdapterPosition());
-                 // sharedPreferences.edit().remove(position).apply();
-                    for(int i = Integer.parseInt(position)+1; i<sharedPreferences.getAll().size();i++)
-                    {
-                        String value = sharedPreferences.getString(String.valueOf(i),"");
-                     sharedPreferences.edit().putString(String.valueOf(i-1),value).apply();
-                    }
-                    sharedPreferences.edit().remove(String.valueOf(sharedPreferences.getAll().size()-1)).apply();
-                    myItemRecyclerViewAdapter.notifyDataSetChanged();
-
+                public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+               sharedPreferences.edit().remove(((BlockedAppsAdapter.ViewHolder)viewHolder).packageName.getText().toString()).apply();
+               list.remove(viewHolder.getAdapterPosition());
+                    blockedAppsAdapter.notifyDataSetChanged();
                 }
             };
-
-             itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+            itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
             itemTouchHelper.attachToRecyclerView(recyclerView);
         }
         return view;
@@ -110,13 +100,13 @@ public class ItemFragment extends Fragment  {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
+        sharedPreferences = context.getSharedPreferences("blocked_apps",0);
+        /*if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
-        }
-        sharedPreferences = context.getSharedPreferences("notification_list",0);
+        }*/
     }
 
     @Override
