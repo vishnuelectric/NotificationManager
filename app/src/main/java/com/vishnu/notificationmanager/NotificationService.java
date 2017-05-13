@@ -49,7 +49,7 @@ Handler handler ;
         try {
 
 
-            for (String a : sharedPreferences1.getAll().keySet()) {
+            /*for (String a : sharedPreferences1.getAll().keySet()) {
                 if(sbn.getPackageName().equalsIgnoreCase(a)) {
                     if (Build.VERSION.SDK_INT >= 21)
                         cancelNotification(sbn.getKey());
@@ -57,7 +57,7 @@ Handler handler ;
                         cancelNotification(a,sbn.getTag(),sbn.getId());
                 }
                // System.out.println(a);
-            }
+            }*/
             System.out.println(sbn.getPackageName());
             if(Arrays.asList(excludedPackages).contains(sbn.getPackageName()))
                 return;

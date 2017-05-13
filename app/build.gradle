@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.vishnu.notificationmanager"
+        applicationId "notification.manager.notification.center"
         minSdkVersion 18
         targetSdkVersion 22
         versionCode 1
@@ -14,7 +14,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -23,18 +23,19 @@ android {
             {
                 playStoreFree
                         {
-                           applicationId "com.vishnu.notificationmanager"
+                           applicationId "notification.manager.notification.center"
                             manifestPlaceholders = [manifestApplicationId: "${applicationId}",
                                                     onesignal_app_id: "81dcd2a0-52ca-42f8-9b9d-b41452aec219",
                                                     onesignal_google_project_number: "927745685992"]
                         }
                 amazonFree
                         {
-                            applicationId "com.vishnu.notificationmanager"
+                            applicationId "notification.manager.notification.center"
                             manifestPlaceholders = [manifestApplicationId: "${applicationId}",
                                                     onesignal_app_id: "81dcd2a0-52ca-42f8-9b9d-b41452aec219",
                                                     onesignal_google_project_number: "927745685992"]
                         }
+
 
             }
 }

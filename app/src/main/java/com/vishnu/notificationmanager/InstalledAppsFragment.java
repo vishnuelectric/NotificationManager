@@ -16,8 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.vishnu.notificationmanager.dummy.DummyContent.DummyItem;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,16 +25,17 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class InstalledAppsFragment extends Fragment {
+public class InstalledAppsFragment extends Fragment  {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
-    private InstalledAppsAdapter installedAppsAdapter;
+    public InstalledAppsAdapter installedAppsAdapter;
     private ItemTouchHelper itemTouchHelper;
     private SharedPreferences sharedPreferences;
+    static InstalledAppsFragment fragment;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -47,7 +46,9 @@ public class InstalledAppsFragment extends Fragment {
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static InstalledAppsFragment newInstance(int columnCount) {
-        InstalledAppsFragment fragment = new InstalledAppsFragment();
+        if(fragment == null)
+        fragment = new InstalledAppsFragment();
+
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -62,7 +63,12 @@ public class InstalledAppsFragment extends Fragment {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
     }
-
+public static InstalledAppsFragment getfragment()
+{if(fragment == null)
+    return null;
+    else
+    return fragment;
+}
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -110,6 +116,7 @@ public class InstalledAppsFragment extends Fragment {
                    String p = ((InstalledAppsAdapter.InstalledAppsViewHolder)viewHolder).packageName.getText().toString();
                     if(p.equalsIgnoreCase("com.vishnu.notificationmanager"))
                         return;
+
                 String name = ((InstalledAppsAdapter.InstalledAppsViewHolder)viewHolder).appName.getText().toString();
                     sharedPreferences.edit().putString(p,name).apply();
                     applist1.remove(viewHolder.getAdapterPosition());
@@ -134,12 +141,12 @@ public class InstalledAppsFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         sharedPreferences =context.getSharedPreferences("blocked_apps",0);
-       /* if (context instanceof OnListFragmentInteractionListener) {
+        if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
-        }*/
+        }
     }
 
     @Override
@@ -148,20 +155,9 @@ public class InstalledAppsFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
-    }
+
+
+
 
     public static class Animate extends DefaultItemAnimator
     {

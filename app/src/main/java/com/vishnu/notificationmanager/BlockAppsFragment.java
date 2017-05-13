@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,8 +12,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.vishnu.notificationmanager.dummy.DummyContent.DummyItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class BlockAppsFragment extends Fragment {
+public class BlockAppsFragment extends Fragment{
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -31,8 +30,10 @@ public class BlockAppsFragment extends Fragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private ItemTouchHelper itemTouchHelper;
-    private BlockedAppsAdapter blockedAppsAdapter;
+    public BlockedAppsAdapter blockedAppsAdapter;
    private SharedPreferences sharedPreferences;
+    public SwipeRefreshLayout swipeRefreshLayout;
+    static BlockAppsFragment fragment;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -44,10 +45,19 @@ public class BlockAppsFragment extends Fragment {
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static BlockAppsFragment newInstance(int columnCount) {
-        BlockAppsFragment fragment = new BlockAppsFragment();
+        if(fragment == null)
+       fragment = new BlockAppsFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
+        return fragment;
+    }
+
+
+    public static BlockAppsFragment getfragment(){
+        if(fragment == null)
+            return null;
+        else
         return fragment;
     }
 
@@ -64,13 +74,17 @@ public class BlockAppsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.blocked_apps_list, container, false);
+        swipeRefreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.block_refresh);
+        swipeRefreshLayout.setColorSchemeColors(new int[]{android.R.color.holo_red_dark, android.R.color.holo_green_dark});
+
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
         final List<String> list = new ArrayList<>();
         list.addAll(sharedPreferences.getAll().keySet());
 blockedAppsAdapter = new BlockedAppsAdapter(getActivity(),list, mListener);
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        if (true) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
@@ -86,12 +100,23 @@ blockedAppsAdapter = new BlockedAppsAdapter(getActivity(),list, mListener);
                 @Override
                 public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                sharedPreferences.edit().remove(((BlockedAppsAdapter.ViewHolder)viewHolder).packageName.getText().toString()).apply();
-               list.remove(viewHolder.getAdapterPosition());
+                   list.clear();
+                    list.addAll(sharedPreferences.getAll().keySet());
+                    if(list.size()>0)
+                    list.remove(viewHolder.getAdapterPosition());
+                    blockedAppsAdapter.setUpdatedSource(list);
                     blockedAppsAdapter.notifyDataSetChanged();
                 }
             };
             itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
             itemTouchHelper.attachToRecyclerView(recyclerView);
+            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    blockedAppsAdapter.notifyDataSetChanged();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            });
         }
         return view;
     }
@@ -101,12 +126,12 @@ blockedAppsAdapter = new BlockedAppsAdapter(getActivity(),list, mListener);
     public void onAttach(Context context) {
         super.onAttach(context);
         sharedPreferences = context.getSharedPreferences("blocked_apps",0);
-        /*if (context instanceof OnListFragmentInteractionListener) {
+        if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
-        }*/
+        }
     }
 
     @Override
@@ -115,18 +140,7 @@ blockedAppsAdapter = new BlockedAppsAdapter(getActivity(),list, mListener);
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
-    }
+
+
+
 }

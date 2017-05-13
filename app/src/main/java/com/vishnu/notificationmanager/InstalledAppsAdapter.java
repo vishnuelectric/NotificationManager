@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vishnu.notificationmanager.InstalledAppsFragment.OnListFragmentInteractionListener;
 import com.vishnu.notificationmanager.dummy.DummyContent.DummyItem;
 
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
  */
 public class InstalledAppsAdapter extends RecyclerView.Adapter<InstalledAppsAdapter.InstalledAppsViewHolder> {
 
-    private final List<ApplicationInfo> mValues;
+    private  List<ApplicationInfo> mValues;
     private final OnListFragmentInteractionListener mListener;
     private PackageManager packageManager;
 
@@ -30,12 +29,20 @@ public class InstalledAppsAdapter extends RecyclerView.Adapter<InstalledAppsAdap
         mListener = listener;
         this.packageManager = packageManager;
     }
-
+    public void setUpdatedSource(List<ApplicationInfo> items)
+    {
+        mValues = items;
+    }
     @Override
     public InstalledAppsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.installed_app_item, parent, false);
         return new InstalledAppsViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(InstalledAppsViewHolder holder, int position, List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
     }
 
     @Override

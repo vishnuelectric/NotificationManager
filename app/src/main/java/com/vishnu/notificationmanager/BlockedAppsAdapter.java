@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vishnu.notificationmanager.BlockAppsFragment.OnListFragmentInteractionListener;
 import com.vishnu.notificationmanager.dummy.DummyContent.DummyItem;
 
 import java.util.List;
@@ -22,7 +21,7 @@ import java.util.List;
  */
 public class BlockedAppsAdapter extends RecyclerView.Adapter<BlockedAppsAdapter.ViewHolder> {
 
-    private final List<String> mValues;
+    private  List<String> mValues;
     private final OnListFragmentInteractionListener mListener;
     private SharedPreferences sharedPreferences;
     private Context context;
@@ -35,7 +34,10 @@ public class BlockedAppsAdapter extends RecyclerView.Adapter<BlockedAppsAdapter.
 
 
     }
-
+public void setUpdatedSource(List<String> items)
+{
+    mValues = items;
+}
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
